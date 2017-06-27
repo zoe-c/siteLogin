@@ -32,7 +32,9 @@ app.use(session({
 
 // // Amy's custom- MW FUNCTION FOR AUTH
 function authenticate(req, username, password) {
-   console.log('authenticating');
+   // console.log('authenticating');
+   var username;
+   var password;
    var authenticatedUser = data.users.find(function (user) {
     if (username === user.username && password === user.password) {
       req.session.authenticated = true;
@@ -62,7 +64,7 @@ app.get('/', function (req, res) {
    console.log(password);
    authenticate(req, username, password);
    if (req.session && req.session.authenticated) {
-      res.render('index', { username: req.body.username });
+      res.render('index', {username});
    } else {
       res.redirect('/login');
    }
@@ -77,10 +79,12 @@ app.get('/login',function(req, res){
 app.post('/login', function(req, res) {
       var username = req.body.username;
       var password = req.body.password;
+      console.log(username);
+      console.log(password);
       authenticate(req, username, password);
       if (req.session && req.session.authenticated) {
          console.log("you are authenticated!");
-         res.redirect('/');
+         res.send('Welcome Back!' + ' You are logged in as:' + {username} );
          // res.render('index', {username : username})
       } else {
          return;
