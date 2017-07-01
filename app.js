@@ -7,7 +7,7 @@ const mustacheExpress = require('mustache-express');
 const data = require('./userData.js');
 // for when you get your gen user auth going..
 // const authorize = require('./routes/auth.js')
-console.log(data);
+
 
 // CREATE APP
 var app = express();
@@ -25,29 +25,24 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 // Session middleware
 app.use(session({
-  secret: 'keyboard cat',
+  secret: 'ssshhh',
   resave: false,
   saveUninitialized: true
 }));
 
-// // Amy's custom- MW FUNCTION FOR AUTH
+//Auth function. could drag this into a sep js
 function authenticate(req, username, password) {
-   // console.log('authenticating');
-   var username;
-   var password;
+   console.log('authenticating');
    var authenticatedUser = data.users.find(function (user) {
     if (username === user.username && password === user.password) {
-      req.session.authenticated = true;
+      return req.session.authenticated = true;
       console.log('User & Password Pass Authentication!');
     } else {
       console.log('Unauthorized!');
       return false;
-      // res.redirect('/login')
      }
 
    });
-   console.log(req.session);
-   return req.session;
 }
 
 // // STATIC FILE/ DIR -----------------------------------
@@ -58,24 +53,14 @@ function authenticate(req, username, password) {
 
 // REQUESTS------------------------------------------------
 app.get('/', function (req, res) {
-   var username = req.body.username;
-   var password = req.body.password;
-   console.log(username);
-   console.log(password);
-   authenticate(req, username, password);
-   if (req.session && req.session.authenticated) {
-      res.render('index', {username});
-   } else {
       res.redirect('/login');
-   }
 });
 
-app.get('/login',function(req, res){
+app.get('/login' ,function(req, res){
    res.render('login');
 });
 
 
-// APP.POST
 app.post('/login', function(req, res) {
       var username = req.body.username;
       var password = req.body.password;
@@ -84,12 +69,12 @@ app.post('/login', function(req, res) {
       authenticate(req, username, password);
       if (req.session && req.session.authenticated) {
          console.log("you are authenticated!");
-         res.send('Welcome Back!' + ' You are logged in as:' + {username} );
-         // res.render('index', {username : username})
+         res.render('index', {username : username})
       } else {
-         return;
+         res.render('login').alert('unauthorized username and password. please try again');
       }
 });
+
 
 // PORT
 app.listen(3000, function(){
